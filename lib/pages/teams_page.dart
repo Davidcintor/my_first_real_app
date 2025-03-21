@@ -1,40 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:my_first_real_app/utils/db.dart';
+import 'package:my_first_real_app/pages/players_page.dart';
 
 class TeamsPage extends StatelessWidget {
-  final List<Map<String, String>> teams = [
-    {
-      'name': 'Equipo A',
-      'image': 'https://via.placeholder.com/150', // URL de imagen de ejemplo
-    },
-    {
-      'name': 'Equipo B',
-      'image': 'https://via.placeholder.com/150', // URL de imagen de ejemplo
-    },
-    {
-      'name': 'Equipo C',
-      'image': 'https://via.placeholder.com/150', // URL de imagen de ejemplo
-    },
-    {
-      'name': 'Equipo D',
-      'image': 'https://via.placeholder.com/150', // URL de imagen de ejemplo
-    },
-    // Agrega más datos dummy aquí
-  ];
-
   @override
   Widget build(BuildContext context) {
+    // Obtener los nombres de los equipos desde la db
+    final teamNames = TeamNamesFromDatabase();
+
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Equipos'),
+      ),
       body: ListView.builder(
-        itemCount: teams.length,
+        itemCount: teamNames.length,
         itemBuilder: (context, index) {
-          final team = teams[index];
+          final teamName = teamNames[index];
           return Card(
             margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
             child: ListTile(
               leading: CircleAvatar(
-                backgroundImage: NetworkImage(team['image']!),
+                backgroundImage: NetworkImage('https://via.placeholder.com/150'),
               ),
-              title: Text(team['name']!),
+              title: Text(teamName),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PlayersPage(teamName: teamName),
+                  ),
+                );
+              },
             ),
           );
         },

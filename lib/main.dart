@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:my_first_real_app/pages/home_page.dart';
 import 'package:my_first_real_app/pages/login_page.dart';
 import 'package:my_first_real_app/pages/splash_screen.dart';
+import 'package:my_first_real_app/pages/teams_page.dart';
+import 'package:my_first_real_app/pages/players_page.dart';
 
 void main() {
   runApp(MyApp());
@@ -19,6 +21,7 @@ class MyApp extends StatelessWidget {
       routes: {
         '/login': (context) => LoginPage(),
         '/home': (context) => HomePage(),
+        '/teams': (context) => TeamsPage(),
       },
     );
   }
