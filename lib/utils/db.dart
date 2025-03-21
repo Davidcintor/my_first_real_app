@@ -1,3 +1,13 @@
+// Variable global para almacenar el tipo de usuario actual
+String userType = '';
+
+// Variable global que contiene los datos de los usuarios y sus roles
+final Map<String, String> usersData = {
+  'test@example.com': 'admin',
+  'capitan@example.com': 'capitan',
+  'jugador@example.com': 'jugador',
+};
+
 // Simular la obtención de datos desde la db
 List<String> TeamNamesFromDatabase() {
   return [

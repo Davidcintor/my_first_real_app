@@ -4,6 +4,8 @@ import 'package:my_first_real_app/pages/teams_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/bottom_navigation_bar.dart';
 import 'calendar_page.dart';
+import 'user_page.dart';
+import 'package:my_first_real_app/utils/db.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,12 +17,12 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
 
-  static  List<Widget> _widgetOptions = <Widget>[
+  List<Widget> _widgetOptions = <Widget>[
     WelcomeWidget(),
     CalendarPage(),
     StatisticsPage(),
-    TeamsPage(),
-    UserPage(),
+    TeamsPage(), // Default userType
+    UserPage(userType: userType), // Default userType
   ];
 
   static const List<String> _titles = <String>[
@@ -30,6 +32,21 @@ class _HomePageState extends State<HomePage> {
     'Equipos',
     'Usuario',
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserType();
+  }
+
+  Future<void> _loadUserType() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      userType = prefs.getString('userType') ?? 'jugador';
+      _widgetOptions[3] = TeamsPage(); // Update TeamsPage with userType
+      _widgetOptions[4] = UserPage(userType: userType); // Update UserPage with userType
+    });
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -86,26 +103,6 @@ class WelcomeWidget extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class UserPage extends StatelessWidget {
-  const UserPage({super.key});
-
-  Future<void> _logout(BuildContext context) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', false);
-    Navigator.pushReplacementNamed(context, '/login');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: ElevatedButton(
-        onPressed: () => _logout(context),
-        child: Text('Logout'),
-      ),
     );
   }
 }

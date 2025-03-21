@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:my_first_real_app/utils/db.dart';
+import 'package:my_first_real_app/pages/home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -11,7 +13,6 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
-  final String dummyEmail = 'test@example.com';
   final String dummyPassword = 'tester';
 
   final TextEditingController _emailController = TextEditingController();
@@ -60,17 +61,24 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       await Future.delayed(Duration(seconds: 2));
 
       // Validate email and password
-      if (_emailController.text == dummyEmail && _passwordController.text == dummyPassword) {
+      if (usersData.containsKey(_emailController.text) && _passwordController.text == dummyPassword) {
         // Save login state
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
+        userType = usersData[_emailController.text]!;
+        await prefs.setString('userType', userType);
 
         setState(() {
           _isLoading = false;
         });
 
         // Navigate to home page
-        Navigator.pushReplacementNamed(context, '/home');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePage(),
+          ),
+        );
       } else {
         setState(() {
           _isLoading = false;
