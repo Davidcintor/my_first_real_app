@@ -1,3 +1,6 @@
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 // Variable global para almacenar el tipo de usuario actual
 String userType = '';
 
@@ -8,26 +11,21 @@ final Map<String, String> usersData = {
   'jugador@example.com': 'jugador',
 };
 
-// Simular la obtención de datos desde la db
-List<String> TeamNamesFromDatabase() {
-  return [
-    'Jicalán Esports',
-    'Santos Grifos FC',
-    'JOGO COIT DRK',
-    'Kings of the north',
-    'Once 33',
-    'Inmigración FC',
-    'Royal Family',
-    'Red Panthers',
-    'LQRa FV',
-    'Quetzalcoatl Esports',
-    'Darketos FC',
-    'Real Mexa',
-    'Forasteros',
-    'Wolf Gaming',
-    'Gunners xFC',
-    'Street Esports',
-  ];
+// Función para obtener los equipos desde la API
+Future<List<Map<String, String>>> TeamsFromAPI() async {
+  final response = await http.get(Uri.parse('https://dev-lemc.onrender.com/equipos'));
+
+  if (response.statusCode == 200) {
+    final List<dynamic> data = json.decode(response.body);
+    return data.map((team) {
+      return {
+        'IdEquipo': team['IdEquipo']?.toString() ?? 'Unknown',
+        'NombreEquipo': team['NombreEquipo']?.toString() ?? 'Unknown',
+      };
+    }).toList();
+  } else {
+    throw Exception('Failed to load teams');
+  }
 }
 
 // Simular la obtención de jugadores para un equipo desde la db

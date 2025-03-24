@@ -1,26 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:my_first_real_app/utils/db.dart';
 import 'package:my_first_real_app/pages/player_detail_page.dart';
+import 'package:my_first_real_app/widgets/add_player.dart';
 
-class PlayersPage extends StatelessWidget {
+class PlayersPage extends StatefulWidget {
   final String teamName;
   final String userType;
 
   PlayersPage({required this.teamName, required this.userType});
 
   @override
-  Widget build(BuildContext context) {
-    final players = PlayersFromDatabase()[teamName] ?? [];
+  _PlayersPageState createState() => _PlayersPageState();
+}
 
+class _PlayersPageState extends State<PlayersPage> {
+  List<Map<String, String>> players = [];
+
+  @override
+  void initState() {
+    super.initState();
+    players = PlayersFromDatabase()[widget.teamName] ?? [];
+  }
+
+  void _addPlayer(Map<String, String> playerData) {
+    setState(() {
+      players.add(playerData);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Jugadores de $teamName'),
-        actions: (userType == 'admin' || userType == 'capitan')
+        title: Text('Jugadores de ${widget.teamName}'),
+        actions: (widget.userType == 'admin' || widget.userType == 'capitan')
             ? [
                 IconButton(
                   icon: Icon(Icons.add),
                   onPressed: () {
-                    // Lógica para agregar un jugador
+                    showDialog(
+                      context: context,
+                      builder: (context) => AddPlayerForm(onAddPlayer: _addPlayer),
+                    );
                   },
                 ),
               ]
@@ -41,7 +62,7 @@ class PlayersPage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => PlayerDetailPage(player: player, userType: userType),
+                    builder: (context) => PlayerDetailPage(player: player, userType: widget.userType),
                   ),
                 );
               },

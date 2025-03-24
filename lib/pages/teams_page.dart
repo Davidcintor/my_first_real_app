@@ -9,10 +9,15 @@ class TeamsPage extends StatefulWidget {
 }
 
 class _TeamsPageState extends State<TeamsPage> {
+  List<Map<String, String>> teams = [];
+  bool isLoading = true;
+  String errorMessage = '';
+
   @override
   void initState() {
     super.initState();
     _loadUserType();
+    _fetchTeams();
   }
 
   Future<void> _loadUserType() async {
@@ -22,38 +27,51 @@ class _TeamsPageState extends State<TeamsPage> {
     });
   }
 
+  Future<void> _fetchTeams() async {
+    try {
+      final fetchedTeams = await TeamsFromAPI();
+      setState(() {
+        teams = fetchedTeams;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+        errorMessage = 'Failed to load teams: $e';
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Obtener los nombres de los equipos desde la db
-    final teamNames = TeamNamesFromDatabase();
-
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Equipos'),
-      ),
-      body: ListView.builder(
-        itemCount: teamNames.length,
-        itemBuilder: (context, index) {
-          final teamName = teamNames[index];
-          return Card(
-            margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundImage: NetworkImage('https://via.placeholder.com/150'),
-              ),
-              title: Text(teamName),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PlayersPage(teamName: teamName, userType: userType),
-                  ),
-                );
-              },
-            ),
-          );
-        },
-      ),
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : errorMessage.isNotEmpty
+              ? Center(child: Text(errorMessage))
+              : ListView.builder(
+                  itemCount: teams.length,
+                  itemBuilder: (context, index) {
+                    final team = teams[index];
+                    return Card(
+                      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundImage: NetworkImage('https://dev-lemc.onrender.com/images'), // Aquí puedes usar la URL real del escudo
+                        ),
+                        title: Text(team['NombreEquipo']!),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PlayersPage(teamName: team['NombreEquipo']!, userType: userType),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
     );
   }
 }
